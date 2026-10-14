@@ -199,6 +199,31 @@ def fallback(text):
                 "    return series\n\n"
                 "print(fibonacci(10))  # [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]\n"
                 "```")
+    if "modern python" in t or ("python" in t and "librar" in t) or ("guide" in t and "python" in t):
+        return ("### Comprehensive Guide to Modern Python & Best Libraries\n\n"
+                "Modern Python (3.11+) brings major performance boosts, static type hints, and asynchronous concurrency.\n\n"
+                "#### 🌟 Top Libraries by Category:\n"
+                "1. **Data Science & ML**: `NumPy` (vector math), `Pandas` (dataframes), `Scikit-Learn` (machine learning), `PyTorch` (deep learning).\n"
+                "2. **Web Frameworks**: `FastAPI` (high-performance async APIs), `Flask` (lightweight microframework), `Streamlit` (interactive AI data apps).\n"
+                "3. **Async & Networking**: `asyncio` (built-in event loop), `httpx` (modern HTTP client with sync/async support).\n"
+                "4. **Data Validation & Typing**: `Pydantic` (fast data modeling via type annotations).\n"
+                "5. **Developer Tooling**: `Ruff` (ultra-fast linter), `Rich` (terminal styling and tables).")
+    if "debug" in t and ("async" in t or "function" in t or "python" in t):
+        return ("### How to Debug Asynchronous Python Functions (`asyncio`)\n\n"
+                "1. **Check for missing `await`**: Unawaited coroutines will return coroutine objects instead of results.\n"
+                "2. **Avoid blocking calls**: Use `asyncio.sleep()` instead of `time.sleep()`.\n"
+                "3. **Run concurrent tasks**: Use `asyncio.gather()` to execute tasks in parallel.\n"
+                "4. **Enable debug mode**: Run `asyncio.run(main(), debug=True)` to track slow operations.")
+    if "architecture" in t or ("project" in t and "idea" in t) or ("full-stack" in t and "ai" in t):
+        return ("### High-Impact Full-Stack AI Project Architectures\n\n"
+                "1. **Real-Time RAG Platform**: Streamlit + FastAPI + ChromaDB/Qdrant + LLM embeddings.\n"
+                "2. **AI Code Auditor**: React Monaco Editor + Python AST parser + CVE security vulnerability chain.\n"
+                "3. **Multimodal Voice Agent**: WebRTC stream + Whisper STT + Gemini Flash + ElevenLabs TTS.")
+    if "t20" in t or "ind vs wi" in t or "cricket" in t or "match" in t:
+        return ("### Cricket & T20 Match Overview\n\n"
+                "For live cricket and T20 International matches (such as India vs West Indies / World Cup games):\n\n"
+                "- 🏏 **Format**: 20 overs per side, emphasizing powerplay strike rates and death bowling.\n"
+                "- 📺 **Live Broadcast**: Streamed live across regional official sports networks (e.g. JioCinema / Hotstar / Willow TV).")
     if "thank" in t: return "You're welcome! 😊 What else can I help with?"
     if any(x in t for x in ["bye", "goodbye", "see you"]): return "Goodbye! 👋 Have a great day."
     return "I can help explain concepts, answer questions, brainstorm, and assist with programming. Feel free to ask anytime!"
