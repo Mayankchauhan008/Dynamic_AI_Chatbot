@@ -34,10 +34,34 @@ def _load_env_file():
 _load_env_file()
 
 def get_api_key():
-    # Check Streamlit Cloud secrets first, then environment / .env
-    if hasattr(st, "secrets") and "GEMINI_API_KEY" in st.secrets:
-        return st.secrets["GEMINI_API_KEY"].strip()
-    return os.getenv("GEMINI_API_KEY", "").strip()
+    # 1. Flexible check in Streamlit Cloud secrets
+    if hasattr(st, "secrets"):
+        for k in ["GEMINI_API_KEY", "gemini_api_key", "GEMINI_KEY", "gemini_key", "API_KEY", "api_key"]:
+            try:
+                if k in st.secrets:
+                    val = str(st.secrets[k]).strip().strip('"').strip("'")
+                    if val:
+                        return val
+            except Exception:
+                pass
+    # 2. Check environment / .env
+    for k in ["GEMINI_API_KEY", "gemini_api_key", "API_KEY"]:
+        val = os.getenv(k, "").strip().strip('"').strip("'")
+        if val:
+            return val
+    return ""
+
+def get_logo_svg():
+    svg_path = os.path.join(ROOT, "static", "logo.svg")
+    if os.path.exists(svg_path):
+        try:
+            with open(svg_path, "r", encoding="utf-8") as f:
+                content = f.read().strip()
+                if content:
+                    return content
+        except Exception:
+            pass
+    return '<svg viewBox="0 0 44 44" width="44" height="44"><rect width="44" height="44" rx="12" fill="#6366f1"/><text x="12" y="28" fill="#fff" font-size="20">🤖</text></svg>'
 
 # ==============================================================================
 # DATABASE MANAGEMENT
@@ -210,33 +234,37 @@ def call_gemini(message, history_list):
     if not api_key:
         return None
 
-    models = [
-        "gemini-2.0-flash",
-        "gemini-1.5-flash",
-        "gemini-2.5-flash",
-        "gemini-1.5-pro",
-        "gemini-flash-latest"
-    ]
-
     contents = []
-    for item in history_list[-10:]:
+    for item in history_list[-8:]:
         role = "user" if item.get("role") == "user" else "model"
         text = str(item.get("content", "")).strip()
         if text:
-            contents.append({"role": role, "parts": [{"text": text[:6000]}]})
+            contents.append({"role": role, "parts": [{"text": text[:5000]}]})
 
     if not contents or contents[-1]["role"] != "user" or contents[-1]["parts"][0]["text"] != message:
         contents.append({"role": "user", "parts": [{"text": message}]})
 
-    payload = {
-        "systemInstruction": {"parts": [{"text": "You are Dynamic AI, a sophisticated, helpful AI assistant. Provide clear, structured, and accurate responses."}]},
-        "contents": contents,
-        "generationConfig": {"temperature": 0.7, "topP": 0.9, "maxOutputTokens": 1400}
-    }
+    # Resilient attempts across Google API versions & models
+    attempts = [
+        ("v1beta", "gemini-2.0-flash", True),
+        ("v1beta", "gemini-1.5-flash", True),
+        ("v1beta", "gemini-1.5-flash", False),
+        ("v1", "gemini-1.5-flash", False),
+        ("v1beta", "gemini-2.5-flash", True),
+        ("v1beta", "gemini-1.5-pro", True),
+    ]
 
-    last_error = None
-    for model in models:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+    for api_version, model, use_sys_instr in attempts:
+        url = f"https://generativelanguage.googleapis.com/{api_version}/models/{model}:generateContent"
+        payload = {
+            "contents": contents,
+            "generationConfig": {"temperature": 0.7, "maxOutputTokens": 1400}
+        }
+        if use_sys_instr:
+            payload["systemInstruction"] = {
+                "parts": [{"text": "You are Dynamic AI, a sophisticated, helpful AI assistant. Provide clear, structured, and accurate responses."}]
+            }
+
         try:
             r = requests.post(url, params={"key": api_key}, json=payload, timeout=20)
             if r.status_code == 200:
@@ -244,17 +272,10 @@ def call_gemini(message, history_list):
                 parts = data.get("candidates", [{}])[0].get("content", {}).get("parts", [])
                 answer = "\n".join(p.get("text", "") for p in parts if p.get("text")).strip()
                 if answer:
-                    if hasattr(st, "session_state"):
-                        st.session_state["last_api_error"] = None
                     return answer
-            else:
-                last_error = f"{r.status_code}: {r.text[:100]}"
-        except Exception as e:
-            last_error = str(e)
+        except Exception:
             continue
 
-    if hasattr(st, "session_state"):
-        st.session_state["last_api_error"] = last_error
     return None
 
 # ==============================================================================
@@ -307,6 +328,20 @@ st.markdown("""
     padding: 8px 0 20px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     margin-bottom: 20px;
+  }
+  .brand-logo-wrap {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .brand-logo-wrap svg {
+    width: 44px;
+    height: 44px;
+    display: block;
+    border-radius: 12px;
   }
   .brand-icon-box {
     width: 40px;
@@ -445,9 +480,12 @@ def db_clear_history(user_id):
 # SIDEBAR NAVIGATION & AUTHENTICATION
 # ==============================================================================
 with st.sidebar:
-    st.markdown("""
+    logo_svg = get_logo_svg()
+    st.markdown(f"""
     <div class="brand-banner">
-        <div class="brand-icon-box">✦</div>
+        <div class="brand-logo-wrap">
+            {logo_svg}
+        </div>
         <div class="brand-text">
             <h1>Dynamic AI</h1>
             <small>Next-Gen Intelligent Dialogue</small>
