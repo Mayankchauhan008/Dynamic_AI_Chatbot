@@ -5,6 +5,7 @@ import json
 import sqlite3
 from collections import Counter
 from datetime import datetime, timezone
+import base64
 import requests
 import streamlit as st
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -51,17 +52,16 @@ def get_api_key():
             return val
     return ""
 
-def get_logo_svg():
+def get_logo_img_tag():
     svg_path = os.path.join(ROOT, "static", "logo.svg")
     if os.path.exists(svg_path):
         try:
-            with open(svg_path, "r", encoding="utf-8") as f:
-                content = f.read().strip()
-                if content:
-                    return content
+            with open(svg_path, "rb") as f:
+                b64 = base64.b64encode(f.read()).decode("utf-8")
+                return f'<img src="data:image/svg+xml;base64,{b64}" width="42" height="42" alt="Logo" style="border-radius:10px;display:block;" />'
         except Exception:
             pass
-    return '<svg viewBox="0 0 44 44" width="44" height="44"><rect width="44" height="44" rx="12" fill="#6366f1"/><text x="12" y="28" fill="#fff" font-size="20">🤖</text></svg>'
+    return '<div class="brand-icon-box">🤖</div>'
 
 # ==============================================================================
 # DATABASE MANAGEMENT
@@ -337,7 +337,7 @@ st.markdown("""
     justify-content: center;
     flex-shrink: 0;
   }
-  .brand-logo-wrap svg {
+  .brand-logo-wrap img {
     width: 44px;
     height: 44px;
     display: block;
@@ -480,11 +480,11 @@ def db_clear_history(user_id):
 # SIDEBAR NAVIGATION & AUTHENTICATION
 # ==============================================================================
 with st.sidebar:
-    logo_svg = get_logo_svg()
+    logo_html = get_logo_img_tag()
     st.markdown(f"""
     <div class="brand-banner">
         <div class="brand-logo-wrap">
-            {logo_svg}
+            {logo_html}
         </div>
         <div class="brand-text">
             <h1>Dynamic AI</h1>
