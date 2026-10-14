@@ -118,6 +118,37 @@ def offline_fallback(text):
                 "4. **Case Studies**: End-to-end design of real-world ML systems with trade-offs.")
     if "thank" in t:
         return "You're very welcome! 😊 Feel free to ask anytime."
+    if "swap" in t and ("number" in t or "variable" in t or "py" in t or "code" in t):
+        return ("### Python Program to Swap Two Numbers\n\n"
+                "Here are the standard approaches in Python:\n\n"
+                "#### 1. Pythonic One-Liner (Tuple Unpacking - Recommended)\n"
+                "```python\n"
+                "# Define two numbers\n"
+                "a = 10\n"
+                "b = 20\n"
+                "print(f\"Before swap: a = {a}, b = {b}\")\n\n"
+                "# Swap in a single line\n"
+                "a, b = b, a\n\n"
+                "print(f\"After swap:  a = {a}, b = {b}\")\n"
+                "```\n\n"
+                "#### 2. Using a Temporary Variable (`temp`)\n"
+                "```python\n"
+                "a = 10\n"
+                "b = 20\n\n"
+                "temp = a\n"
+                "a = b\n"
+                "b = temp\n\n"
+                "print(f\"After swap: a = {a}, b = {b}\")\n"
+                "```\n\n"
+                "#### 3. Using Arithmetic Operators (+ and -)\n"
+                "```python\n"
+                "a = 10\n"
+                "b = 20\n\n"
+                "a = a + b  # 30\n"
+                "b = a - b  # 10\n"
+                "a = a - b  # 20\n\n"
+                "print(f\"After swap: a = {a}, b = {b}\")\n"
+                "```")
     if any(x in t for x in ["bye", "goodbye", "see you"]):
         return "Goodbye! 👋 Have a wonderful day ahead."
     return ("I can help answer questions, brainstorm ideas, analyze code, and explain concepts.\n\n"
@@ -129,11 +160,11 @@ def call_gemini(message, history_list):
         return None
 
     models = [
-        "gemini-3.6-flash",
-        "gemini-3.5-flash",
-        "gemini-flash-latest",
-        "gemini-3.1-flash-lite",
-        "gemini-3.8-flash"
+        "gemini-2.5-flash",
+        "gemini-2.0-flash",
+        "gemini-1.5-flash",
+        "gemini-1.5-pro",
+        "gemini-flash-latest"
     ]
 
     contents = []
@@ -171,7 +202,7 @@ def call_gemini(message, history_list):
 # ==============================================================================
 st.set_page_config(
     page_title="Dynamic AI — Intelligent Assistant",
-    page_icon="✦",
+    page_icon="🤖",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -543,7 +574,7 @@ else:
         for msg in st.session_state.messages:
             role = msg.get("role", "user")
             content = msg.get("content", "")
-            with st.chat_message(role, avatar="👤" if role == "user" else "✦"):
+            with st.chat_message(role, avatar="👤" if role == "user" else "🤖"):
                 st.markdown(content)
                 sentiment = msg.get("sentiment")
                 topic = msg.get("topic")
@@ -572,7 +603,7 @@ else:
         sent = analyze_sentiment(prompt)
         top = analyze_topic(prompt)
 
-        with st.chat_message("assistant", avatar="✦"):
+        with st.chat_message("assistant", avatar="🤖"):
             with st.spinner("Reasoning…"):
                 ai_reply = call_gemini(prompt, st.session_state.messages)
                 mode = "gemini" if ai_reply else "local"

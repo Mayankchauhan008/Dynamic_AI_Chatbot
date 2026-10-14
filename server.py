@@ -77,7 +77,7 @@ def get_supported_model(api_key):
     global _DETECTED_MODEL
     if _DETECTED_MODEL:
         return _DETECTED_MODEL
-    _DETECTED_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.6-flash").strip() or "gemini-3.6-flash"
+    _DETECTED_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash").strip() or "gemini-2.5-flash"
     return _DETECTED_MODEL
 
 
@@ -140,6 +140,37 @@ def fallback(text):
                 "2. **Document QA with RAG**: Vector search (FAISS/Chroma) + LLM embeddings for PDF analysis.\n"
                 "3. **Real-time Object Detection**: Computer vision with YOLOv8 on custom video streams.\n"
                 "4. **Sentiment & Aspect Mining**: Fine-tuned Transformer (BERT/RoBERTa) on user feedback.")
+    if "swap" in t and ("number" in t or "variable" in t or "py" in t or "code" in t):
+        return ("### Python Program to Swap Two Numbers\n\n"
+                "Here are the standard approaches in Python:\n\n"
+                "#### 1. Pythonic One-Liner (Tuple Unpacking - Recommended)\n"
+                "```python\n"
+                "# Define two numbers\n"
+                "a = 10\n"
+                "b = 20\n"
+                "print(f\"Before swap: a = {a}, b = {b}\")\n\n"
+                "# Swap in a single line\n"
+                "a, b = b, a\n\n"
+                "print(f\"After swap:  a = {a}, b = {b}\")\n"
+                "```\n\n"
+                "#### 2. Using a Temporary Variable (`temp`)\n"
+                "```python\n"
+                "a = 10\n"
+                "b = 20\n\n"
+                "temp = a\n"
+                "a = b\n"
+                "b = temp\n\n"
+                "print(f\"After swap: a = {a}, b = {b}\")\n"
+                "```\n\n"
+                "#### 3. Using Arithmetic Operators (+ and -)\n"
+                "```python\n"
+                "a = 10\n"
+                "b = 20\n\n"
+                "a = a + b  # 30\n"
+                "b = a - b  # 10\n"
+                "a = a - b  # 20\n\n"
+                "print(f\"After swap: a = {a}, b = {b}\")\n"
+                "```")
     if "thank" in t: return "You're welcome! 😊 What else can I help with?"
     if any(x in t for x in ["bye", "goodbye", "see you"]): return "Goodbye! 👋 Have a great day."
     return ("I can help explain concepts, answer questions, brainstorm, and assist with programming.\n\n"
@@ -151,11 +182,11 @@ def ask_gemini(message, history):
 
     # Try verified active models in order of speed and availability
     models_to_try = [
-        "gemini-3.6-flash",
-        "gemini-3.5-flash",
-        "gemini-flash-latest",
-        "gemini-3.1-flash-lite",
-        "gemini-3.8-flash"
+        "gemini-2.5-flash",
+        "gemini-2.0-flash",
+        "gemini-1.5-flash",
+        "gemini-1.5-pro",
+        "gemini-flash-latest"
     ]
 
     contents = []
