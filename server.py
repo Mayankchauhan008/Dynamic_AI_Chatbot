@@ -156,6 +156,41 @@ def fallback(text):
                 "- **Core Domains**: Cloud computing, AI & Cognitive Systems, Enterprise Solutions, Cybersecurity, and IoT.\n"
                 "- **Campus Hiring (TCS NQT)**: Conducts the National Qualifier Test annually to recruit fresh graduates into **Ninja** and **Digital** profiles.\n"
                 "- **Culture & Learning**: Famous for its structured Initial Learning Programs (ILP) and extensive global career mobility.")
+    if "microsoft" in t:
+        return ("### Microsoft Corporation\n\n"
+                "**Microsoft** is a global technology leader headquartered in Redmond, Washington.\n\n"
+                "#### 🏢 Key Domains & Products:\n"
+                "- **Software**: Windows OS, Office 365, Visual Studio / VS Code, GitHub.\n"
+                "- **Cloud & AI**: Microsoft Azure (enterprise cloud computing), Azure OpenAI Service, Copilot integrations.\n"
+                "- **Gaming & Hardware**: Xbox ecosystem, Surface devices, LinkedIn professional network.")
+    if "google" in t or "alphabet" in t:
+        return ("### Google (Alphabet Inc.)\n\n"
+                "**Google** is a world-leading technology company specializing in search, cloud, AI, and consumer software.\n\n"
+                "#### 🌟 Key Innovations:\n"
+                "- **AI & Research**: Google DeepMind, Gemini generative models, AlphaFold, Transformer architecture.\n"
+                "- **Platforms**: Google Search, Android OS, Chromium, YouTube, Google Cloud Platform (GCP).")
+    if ("py code" in t or "python code" in t or "code" in t) and "swap" not in t:
+        return ("### Python Code Examples & Best Practices\n\n"
+                "Here are practical, commonly used Python patterns:\n\n"
+                "#### 1. List Comprehensions\n"
+                "```python\n"
+                "# Filter even numbers and square them\n"
+                "nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\n"
+                "even_squares = [x**2 for x in nums if x % 2 == 0]\n"
+                "print(even_squares)  # [4, 16, 36, 64, 100]\n"
+                "```\n\n"
+                "#### 2. Clean Dictionary Handling\n"
+                "```python\n"
+                "data = {'role': 'developer', 'active': True}\n"
+                "status = data.get('status', 'pending')\n"
+                "```\n\n"
+                "#### 3. Exception Handling\n"
+                "```python\n"
+                "try:\n"
+                "    result = 100 / value\n"
+                "except ZeroDivisionError:\n"
+                "    result = 0\n"
+                "```")
     if "swap" in t and ("number" in t or "variable" in t or "py" in t or "code" in t):
         return ("### Python Program to Swap Two Numbers\n\n"
                 "Here are the standard approaches in Python:\n\n"
