@@ -34,9 +34,13 @@ def _load_env_file():
 _load_env_file()
 
 def get_api_key():
-    # Check Streamlit Cloud secrets first, then environment / .env
+    # 1. Custom key entered by user in UI session state
+    if hasattr(st, "session_state") and st.session_state.get("custom_api_key"):
+        return st.session_state["custom_api_key"].strip()
+    # 2. Check Streamlit Cloud secrets first
     if hasattr(st, "secrets") and "GEMINI_API_KEY" in st.secrets:
         return st.secrets["GEMINI_API_KEY"].strip()
+    # 3. Check environment / .env
     return os.getenv("GEMINI_API_KEY", "").strip()
 
 # ==============================================================================
@@ -118,6 +122,18 @@ def offline_fallback(text):
                 "4. **Case Studies**: End-to-end design of real-world ML systems with trade-offs.")
     if "thank" in t:
         return "You're very welcome! 😊 Feel free to ask anytime."
+    if "zidio" in t:
+        return ("### About Zidio Development\n\n"
+                "**Zidio Development** is an innovative software development, IT consulting, and student mentorship organization.\n\n"
+                "#### 🌟 Key Highlights & Services:\n"
+                "1. **Industry Internship Programs**: Offers comprehensive, hands-on internships for students and aspiring developers across:\n"
+                "   - Full-Stack Web Development (Python, Flask, React, Node.js)\n"
+                "   - Artificial Intelligence & Machine Learning (NLP, LLMs, Computer Vision)\n"
+                "   - Data Science & Analytics\n"
+                "   - Cloud Computing & DevOps\n"
+                "2. **Real-World Project Experience**: Interns build production-ready applications, participate in code reviews, use Git/GitHub workflows, and deploy live to the cloud.\n"
+                "3. **Skill Acceleration & Career Mentorship**: Provides resume reviews, technical interview prep, and industry mentor guidance.\n\n"
+                "> 💡 *This **Dynamic AI Chatbot** was architected and built as a featured project within the Zidio Development Internship program.*")
     if "swap" in t and ("number" in t or "variable" in t or "py" in t or "code" in t):
         return ("### Python Program to Swap Two Numbers\n\n"
                 "Here are the standard approaches in Python:\n\n"
@@ -149,10 +165,42 @@ def offline_fallback(text):
                 "a = a - b  # 20\n\n"
                 "print(f\"After swap: a = {a}, b = {b}\")\n"
                 "```")
+    if "fibonacci" in t:
+        return ("### Fibonacci Series in Python\n\n"
+                "```python\n"
+                "def fibonacci(n):\n"
+                "    a, b = 0, 1\n"
+                "    series = []\n"
+                "    for _ in range(n):\n"
+                "        series.append(a)\n"
+                "        a, b = b, a + b\n"
+                "    return series\n\n"
+                "# Generate first 10 Fibonacci numbers\n"
+                "print(fibonacci(10))  # [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]\n"
+                "```")
+    if "reverse" in t and ("string" in t or "word" in t or "py" in t or "code" in t):
+        return ("### Reverse a String in Python\n\n"
+                "```python\n"
+                "text = 'Hello World'\n\n"
+                "# 1. Slicing (Fastest & most Pythonic)\n"
+                "reversed_text = text[::-1]\n"
+                "print(reversed_text)  # 'dlroW olleH'\n\n"
+                "# 2. Using reversed() and join\n"
+                "reversed_text2 = ''.join(reversed(text))\n"
+                "print(reversed_text2)\n"
+                "```")
+    if "machine learning" in t or "ml" in t or "deep learning" in t:
+        return ("### Machine Learning Fundamentals\n\n"
+                "Machine Learning (ML) is a subset of Artificial Intelligence where algorithms learn patterns from data rather than being explicitly programmed.\n\n"
+                "#### Key Paradigms:\n"
+                "1. **Supervised Learning**: Model learns from labeled data (e.g. Classification with Random Forest, Regression with Linear Models).\n"
+                "2. **Unsupervised Learning**: Discover hidden patterns in unlabeled data (e.g. K-Means clustering, PCA dimensionality reduction).\n"
+                "3. **Reinforcement Learning**: Agent learns through trial and error with reward feedback (e.g. Q-Learning, PPO).\n"
+                "4. **Deep Learning**: Multi-layered Artificial Neural Networks (CNNs for computer vision, Transformers for LLMs and NLP).")
     if any(x in t for x in ["bye", "goodbye", "see you"]):
         return "Goodbye! 👋 Have a wonderful day ahead."
     return ("I can help answer questions, brainstorm ideas, analyze code, and explain concepts.\n\n"
-            "💡 *Tip: Add your `GEMINI_API_KEY` to unlock full generative cloud intelligence.*")
+            "💡 *Tip: Enter your free **Gemini API Key** in the sidebar (or in Streamlit Secrets) to unlock live cloud AI answers for any topic!*")
 
 def call_gemini(message, history_list):
     api_key = get_api_key()
@@ -160,9 +208,9 @@ def call_gemini(message, history_list):
         return None
 
     models = [
-        "gemini-2.5-flash",
         "gemini-2.0-flash",
         "gemini-1.5-flash",
+        "gemini-2.5-flash",
         "gemini-1.5-pro",
         "gemini-flash-latest"
     ]
@@ -183,18 +231,27 @@ def call_gemini(message, history_list):
         "generationConfig": {"temperature": 0.7, "topP": 0.9, "maxOutputTokens": 1400}
     }
 
+    last_error = None
     for model in models:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
         try:
-            r = requests.post(url, params={"key": api_key}, json=payload, timeout=25)
+            r = requests.post(url, params={"key": api_key}, json=payload, timeout=20)
             if r.status_code == 200:
                 data = r.json()
                 parts = data.get("candidates", [{}])[0].get("content", {}).get("parts", [])
                 answer = "\n".join(p.get("text", "") for p in parts if p.get("text")).strip()
                 if answer:
+                    if hasattr(st, "session_state"):
+                        st.session_state["last_api_error"] = None
                     return answer
-        except Exception:
+            else:
+                last_error = f"{r.status_code}: {r.text[:100]}"
+        except Exception as e:
+            last_error = str(e)
             continue
+
+    if hasattr(st, "session_state"):
+        st.session_state["last_api_error"] = last_error
     return None
 
 # ==============================================================================
@@ -423,6 +480,27 @@ with st.sidebar:
         st.info("Browsing in **Guest Mode**")
         st.caption("Sign in to save and sync conversation history to cloud vault.")
 
+    # API Key Configuration Card
+    st.divider()
+    active_key = get_api_key()
+    with st.expander("🔑 Gemini Cloud AI Key", expanded=not bool(active_key)):
+        user_key = st.text_input(
+            "Gemini API Key",
+            value=st.session_state.get("custom_api_key", ""),
+            type="password",
+            placeholder="AIzaSy...",
+            help="Free key from Google AI Studio: aistudio.google.com"
+        )
+        if user_key != st.session_state.get("custom_api_key", ""):
+            st.session_state["custom_api_key"] = user_key
+            st.rerun()
+
+        if active_key:
+            st.success("🟢 Cloud Generative AI Active")
+        else:
+            st.info("🟡 Offline Knowledge Active")
+            st.caption("[Get a free Gemini API key →](https://aistudio.google.com/app/apikey)")
+
 # ==============================================================================
 # VIEW: ACCOUNT (LOGIN & REGISTER)
 # ==============================================================================
@@ -611,7 +689,14 @@ else:
                 elapsed_ms = round((time.perf_counter() - start_time) * 1000)
 
                 st.markdown(reply)
-                tags_html = f'<span class="tag-bubble">Sentiment: {sent}</span><span class="tag-bubble">Topic: {top}</span>'
+                tags_html = f'<span class="tag-bubble">Mode: {"Gemini Cloud AI" if mode == "gemini" else "Knowledge Base"}</span>'
+                tags_html += f'<span class="tag-bubble">Sentiment: {sent}</span><span class="tag-bubble">Topic: {top}</span>'
+                if mode == "local" and st.session_state.get("last_api_error"):
+                    err = str(st.session_state["last_api_error"])
+                    if "403" in err:
+                        tags_html += '<span class="tag-bubble" style="color:#ef4444;border-color:#ef4444;">API Key Expired/Forbidden (403)</span>'
+                    elif "429" in err:
+                        tags_html += '<span class="tag-bubble" style="color:#f59e0b;border-color:#f59e0b;">API Quota Limit (429)</span>'
                 st.markdown(tags_html, unsafe_allow_html=True)
 
         # Store in session state

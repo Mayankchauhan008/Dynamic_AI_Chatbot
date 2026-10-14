@@ -140,6 +140,14 @@ def fallback(text):
                 "2. **Document QA with RAG**: Vector search (FAISS/Chroma) + LLM embeddings for PDF analysis.\n"
                 "3. **Real-time Object Detection**: Computer vision with YOLOv8 on custom video streams.\n"
                 "4. **Sentiment & Aspect Mining**: Fine-tuned Transformer (BERT/RoBERTa) on user feedback.")
+    if "zidio" in t:
+        return ("### About Zidio Development\n\n"
+                "**Zidio Development** is an innovative software development, IT consulting, and student mentorship organization.\n\n"
+                "#### 🌟 Key Highlights & Services:\n"
+                "1. **Industry Internship Programs**: Offers comprehensive, hands-on internships across Full-Stack Web Development, AI/ML, Data Science, and Cloud Computing.\n"
+                "2. **Real-World Project Experience**: Interns build production applications, participate in code reviews, use Git/GitHub, and deploy live.\n"
+                "3. **Skill Acceleration & Career Mentorship**: Provides resume reviews, technical interview prep, and industry mentor guidance.\n\n"
+                "> 💡 *This **Dynamic AI Chatbot** was built as a featured project within the Zidio Development Internship program.*")
     if "swap" in t and ("number" in t or "variable" in t or "py" in t or "code" in t):
         return ("### Python Program to Swap Two Numbers\n\n"
                 "Here are the standard approaches in Python:\n\n"
@@ -170,6 +178,18 @@ def fallback(text):
                 "b = a - b  # 10\n"
                 "a = a - b  # 20\n\n"
                 "print(f\"After swap: a = {a}, b = {b}\")\n"
+                "```")
+    if "fibonacci" in t:
+        return ("### Fibonacci Series in Python\n\n"
+                "```python\n"
+                "def fibonacci(n):\n"
+                "    a, b = 0, 1\n"
+                "    series = []\n"
+                "    for _ in range(n):\n"
+                "        series.append(a)\n"
+                "        a, b = b, a + b\n"
+                "    return series\n\n"
+                "print(fibonacci(10))  # [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]\n"
                 "```")
     if "thank" in t: return "You're welcome! 😊 What else can I help with?"
     if any(x in t for x in ["bye", "goodbye", "see you"]): return "Goodbye! 👋 Have a great day."
