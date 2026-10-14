@@ -148,6 +148,14 @@ def fallback(text):
                 "2. **Real-World Project Experience**: Interns build production applications, participate in code reviews, use Git/GitHub, and deploy live.\n"
                 "3. **Skill Acceleration & Career Mentorship**: Provides resume reviews, technical interview prep, and industry mentor guidance.\n\n"
                 "> 💡 *This **Dynamic AI Chatbot** was built as a featured project within the Zidio Development Internship program.*")
+    if "tcs" in t or "tata consultancy" in t:
+        return ("### Tata Consultancy Services (TCS)\n\n"
+                "**Tata Consultancy Services (TCS)** is an Indian multinational IT services and consulting company headquartered in Mumbai. It is the flagship IT company of the **Tata Group** and one of the world's most valuable IT service brands.\n\n"
+                "#### 🏢 Key Highlights:\n"
+                "- **Global Scale**: Operates in 150+ locations across 50+ countries with over 600,000 employees.\n"
+                "- **Core Domains**: Cloud computing, AI & Cognitive Systems, Enterprise Solutions, Cybersecurity, and IoT.\n"
+                "- **Campus Hiring (TCS NQT)**: Conducts the National Qualifier Test annually to recruit fresh graduates into **Ninja** and **Digital** profiles.\n"
+                "- **Culture & Learning**: Famous for its structured Initial Learning Programs (ILP) and extensive global career mobility.")
     if "swap" in t and ("number" in t or "variable" in t or "py" in t or "code" in t):
         return ("### Python Program to Swap Two Numbers\n\n"
                 "Here are the standard approaches in Python:\n\n"
