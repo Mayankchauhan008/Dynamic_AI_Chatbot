@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dynamic AI — Intelligent Assistant</title>
+  <link rel="icon" type="image/svg+xml" href="/static/logo.svg">
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css?v=29.0">
+</head>
+<body class="dark-mode">
+
+  <div class="app-shell">
+    <!-- Sidebar -->
+    <aside class="app-sidebar" id="sidebar">
+      <div class="sidebar-top">
+        <div class="brand-header">
+          <div class="brand-avatar">
+            <img src="/static/logo.svg" alt="Dynamic AI Logo" class="brand-logo-img">
+          </div>
+          <div class="brand-info">
+            <span class="brand-name">Dynamic AI</span>
+          </div>
+        </div>
+
+        <button id="newChat" class="btn-new-chat">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <span>New Conversation</span>
+        </button>
+
+        <div class="nav-group">
+          <span class="nav-label">WORKSPACE</span>
+          <button class="nav-item active" data-view="chat">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            <span>Chat</span>
+          </button>
+          <button class="nav-item" data-view="analytics">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+            <span>Analytics</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="sidebar-bottom">
+        <button id="theme" class="btn-theme-switch">
+          <svg class="sun-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          <svg class="moon-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          <span id="themeText">Toggle Theme</span>
+        </button>
+
+        <div class="user-chip-container" id="userChipContainer">
+          <div class="user-chip" id="userChip" tabindex="0" role="button" aria-haspopup="true" aria-expanded="false">
+            <div class="user-avatar" id="userAvatar">AI</div>
+            <div class="user-info">
+              <b id="userName">Guest User</b>
+              <small id="userRole">Personal Workspace</small>
+            </div>
+            <button id="authBtn" class="btn-auth-action" title="Sign In or Register">Sign In</button>
+          </div>
+
+          <!-- Profile Popover Menu -->
+          <div class="profile-dropdown hidden" id="profileDropdown">
+            <div class="profile-dropdown-header">
+              <div class="dropdown-avatar" id="dropdownAvatar">AI</div>
+              <div class="dropdown-user-meta">
+                <b id="dropdownUserName">Guest User</b>
+                <span id="dropdownUserEmail">guest@workspace</span>
+                <small id="dropdownUserDate">Active Session</small>
+              </div>
+            </div>
+            <div class="dropdown-stats-row">
+              <div class="dropdown-stat">
+                <span class="d-stat-val" id="dChatCount">0</span>
+                <span class="d-stat-lbl">Saved Chats</span>
+              </div>
+              <div class="dropdown-stat">
+                <span class="d-stat-val" id="dMemberStatus">Guest</span>
+                <span class="d-stat-lbl">Account</span>
+              </div>
+            </div>
+            <div class="dropdown-actions">
+              <a href="/login" class="dropdown-item" id="goToLoginLink">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+                <span>Full Login / Register Page</span>
+              </a>
+              <button type="button" class="dropdown-item danger hidden" id="btnClearSavedHistory">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                <span>Clear Cloud History</span>
+              </button>
+              <button type="button" class="dropdown-item hidden" id="btnLogoutAction">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                <span>Sign Out</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="app-main">
+      <header class="app-header">
+        <div class="header-left">
+          <button id="menu" class="btn-icon mobile-menu" aria-label="Toggle Navigation">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+          <div class="header-title-box">
+            <div class="crumb-trail">WORKSPACE / <span id="crumb">CHAT</span></div>
+            <h1 id="title" class="main-heading">What would you like to explore?</h1>
+          </div>
+        </div>
+        <div class="header-right">
+          <a href="/login" class="btn-header-auth" id="headerAuthBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <span>Sign In / Register</span>
+          </a>
+          <button id="export" class="btn-export" title="Export conversation as JSON">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>Export Chat</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Chat View -->
+      <section id="chatView" class="view-panel chat-panel">
+        <div id="welcome" class="welcome-hero">
+          <div class="hero-sparkle">✦</div>
+          <h2 class="hero-title">Where curiosity meets intelligence.</h2>
+          <p class="hero-desc">Ask complex questions, write code, analyze data, or brainstorm breakthrough ideas.</p>
+
+          <div class="cards-grid">
+            <div class="prompt-card" data-prompt="Give me a comprehensive guide to modern Python and its best libraries">
+              <div class="card-icon">🐍</div>
+              <div class="card-texts">
+                <b>Python Deep Dive</b>
+                <span>Ecosystem, OOP, frameworks & best practices</span>
+              </div>
+            </div>
+            <div class="prompt-card" data-prompt="Explain gradient descent and optimization with clear step-by-step math">
+              <div class="card-icon">🧠</div>
+              <div class="card-texts">
+                <b>Machine Learning Core</b>
+                <span>Gradient descent, backpropagation & algorithms</span>
+              </div>
+            </div>
+            <div class="prompt-card" data-prompt="Help me debug a difficult error and write high-performance code">
+              <div class="card-icon">⚡</div>
+              <div class="card-texts">
+                <b>Code & Debug</b>
+                <span>Analyze tracebacks, refactor & optimize logic</span>
+              </div>
+            </div>
+            <div class="prompt-card" data-prompt="Give me high-impact full-stack AI project ideas with complete architecture">
+              <div class="card-icon">💡</div>
+              <div class="card-texts">
+                <b>Project Architecture</b>
+                <span>Full-stack web apps, vector RAG & LLMs</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Stream -->
+        <div id="messages" class="messages-stream"></div>
+
+        <!-- Floating Input Capsule -->
+        <div class="input-container">
+          <form id="form" class="composer-capsule">
+            <textarea id="input" rows="1" maxlength="6000" placeholder="Ask Dynamic AI anything…"></textarea>
+            <div class="composer-controls">
+              <span class="key-hint">Press <strong>Enter ↵</strong> to send</span>
+              <button id="send" type="submit" class="btn-send-round" aria-label="Send">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+              </button>
+            </div>
+          </form>
+          <div class="legal-footnote">Dynamic AI may make mistakes. Verify critical technical data.</div>
+        </div>
+      </section>
+
+      <!-- Analytics View -->
+      <section id="analyticsView" class="view-panel analytics-panel hidden">
+        <div class="analytics-head">
+          <div>
+            <h2>Usage & Sentiment Analytics</h2>
+            <p>Session telemetry and intent categorization metrics.</p>
+          </div>
+          <button id="refresh" class="btn-refresh">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+            <span>Refresh</span>
+          </button>
+        </div>
+
+        <div class="stats-overview">
+          <div class="stat-card">
+            <span class="stat-lbl">TOTAL QUERIES</span>
+            <b id="mMessages" class="stat-num">0</b>
+            <small>Processed messages</small>
+          </div>
+          <div class="stat-card highlight">
+            <span class="stat-lbl">AI RESPONSES</span>
+            <b id="mAI" class="stat-num">0</b>
+            <small>Cloud Neural Engine</small>
+          </div>
+          <div class="stat-card">
+            <span class="stat-lbl">LOCAL FALLBACKS</span>
+            <b id="mFallback" class="stat-num">0</b>
+            <small>Offline responses</small>
+          </div>
+          <div class="stat-card">
+            <span class="stat-lbl">AVG LATENCY</span>
+            <b id="mTime" class="stat-num">0 ms</b>
+            <small>Server roundtrip</small>
+          </div>
+        </div>
+
+        <div class="charts-row">
+          <div class="chart-box">
+            <h3>Sentiment Analysis</h3>
+            <div id="sentiments" class="chart-content">No metrics yet.</div>
+          </div>
+          <div class="chart-box">
+            <h3>Topic Distribution</h3>
+            <div id="topics" class="chart-content">No metrics yet.</div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="bottom-footer">
+        <span>✦ Dynamic AI Chatbot</span>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Authentication Modal (Sign In & Register) -->
+  <div class="modal-backdrop hidden" id="authModal">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-brand">
+          <div class="auth-icon">
+            <img src="/static/logo.svg" alt="Dynamic AI Logo" class="brand-logo-img">
+          </div>
+          <div>
+            <h3 id="authModalTitle">Welcome to Dynamic AI</h3>
+            <small>Sign in to save and sync your conversations</small>
+          </div>
+        </div>
+        <button class="btn-close-modal" id="closeAuthModal" aria-label="Close modal">✕</button>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin" type="button">Sign In</button>
+        <button class="auth-tab" id="tabRegister" type="button">Create Account</button>
+      </div>
+
+      <div class="auth-alert hidden" id="authAlert"></div>
+
+      <!-- Login Form -->
+      <form id="loginForm" class="auth-form">
+        <div class="form-group">
+          <label for="loginUser">Username or Email</label>
+          <div class="input-wrap">
+            <input type="text" id="loginUser" required placeholder="Enter username or email" autocomplete="username">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="loginPass">Password</label>
+          <div class="input-wrap">
+            <input type="password" id="loginPass" required placeholder="Enter your password" autocomplete="current-password">
+          </div>
+        </div>
+        <button type="submit" class="btn-auth-submit" id="loginSubmit">
+          <span>Sign In</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </button>
+      </form>
+
+      <!-- Register Form -->
+      <form id="registerForm" class="auth-form hidden">
+        <div class="form-group">
+          <label for="regUser">Username</label>
+          <div class="input-wrap">
+            <input type="text" id="regUser" required placeholder="Choose a username (min 3 chars)" autocomplete="username">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="regEmail">Email Address <small>(optional)</small></label>
+          <div class="input-wrap">
+            <input type="email" id="regEmail" placeholder="your@email.com" autocomplete="email">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="regPass">Password</label>
+          <div class="input-wrap">
+            <input type="password" id="regPass" required placeholder="Create password (min 6 chars)" autocomplete="new-password">
+          </div>
+        </div>
+        <button type="submit" class="btn-auth-submit" id="regSubmit">
+          <span>Create Free Account</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+      </form>
+
+      <div class="modal-auth-footer">
+        <a href="/login" class="link-open-full-auth">
+          <span>Open dedicated Full-Screen Login & Register page</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast-popup"></div>
+  <script src="/static/app.js?v=29.0"></script>
+</body>
+</html>
