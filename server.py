@@ -193,8 +193,7 @@ def fallback(text):
                 "```")
     if "thank" in t: return "You're welcome! 😊 What else can I help with?"
     if any(x in t for x in ["bye", "goodbye", "see you"]): return "Goodbye! 👋 Have a great day."
-    return ("I can help explain concepts, answer questions, brainstorm, and assist with programming.\n\n"
-            "💡 *Tip: Configure your `GEMINI_API_KEY` in `.env` to unlock live generative responses.*")
+    return "I can help explain concepts, answer questions, brainstorm, and assist with programming. Feel free to ask anytime!"
 
 def ask_gemini(message, history):
     api_key, _ = get_api_config()

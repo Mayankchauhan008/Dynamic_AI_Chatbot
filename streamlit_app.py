@@ -34,13 +34,9 @@ def _load_env_file():
 _load_env_file()
 
 def get_api_key():
-    # 1. Custom key entered by user in UI session state
-    if hasattr(st, "session_state") and st.session_state.get("custom_api_key"):
-        return st.session_state["custom_api_key"].strip()
-    # 2. Check Streamlit Cloud secrets first
+    # Check Streamlit Cloud secrets first, then environment / .env
     if hasattr(st, "secrets") and "GEMINI_API_KEY" in st.secrets:
         return st.secrets["GEMINI_API_KEY"].strip()
-    # 3. Check environment / .env
     return os.getenv("GEMINI_API_KEY", "").strip()
 
 # ==============================================================================
@@ -199,8 +195,7 @@ def offline_fallback(text):
                 "4. **Deep Learning**: Multi-layered Artificial Neural Networks (CNNs for computer vision, Transformers for LLMs and NLP).")
     if any(x in t for x in ["bye", "goodbye", "see you"]):
         return "Goodbye! 👋 Have a wonderful day ahead."
-    return ("I can help answer questions, brainstorm ideas, analyze code, and explain concepts.\n\n"
-            "💡 *Tip: Enter your free **Gemini API Key** in the sidebar (or in Streamlit Secrets) to unlock live cloud AI answers for any topic!*")
+    return "I can help answer questions, brainstorm ideas, analyze code, and explain concepts. Feel free to ask anything!"
 
 def call_gemini(message, history_list):
     api_key = get_api_key()
@@ -480,27 +475,6 @@ with st.sidebar:
         st.info("Browsing in **Guest Mode**")
         st.caption("Sign in to save and sync conversation history to cloud vault.")
 
-    # API Key Configuration Card
-    st.divider()
-    active_key = get_api_key()
-    with st.expander("🔑 Gemini Cloud AI Key", expanded=not bool(active_key)):
-        user_key = st.text_input(
-            "Gemini API Key",
-            value=st.session_state.get("custom_api_key", ""),
-            type="password",
-            placeholder="AIzaSy...",
-            help="Free key from Google AI Studio: aistudio.google.com"
-        )
-        if user_key != st.session_state.get("custom_api_key", ""):
-            st.session_state["custom_api_key"] = user_key
-            st.rerun()
-
-        if active_key:
-            st.success("🟢 Cloud Generative AI Active")
-        else:
-            st.info("🟡 Offline Knowledge Active")
-            st.caption("[Get a free Gemini API key →](https://aistudio.google.com/app/apikey)")
-
 # ==============================================================================
 # VIEW: ACCOUNT (LOGIN & REGISTER)
 # ==============================================================================
@@ -689,15 +663,13 @@ else:
                 elapsed_ms = round((time.perf_counter() - start_time) * 1000)
 
                 st.markdown(reply)
-                tags_html = f'<span class="tag-bubble">Mode: {"Gemini Cloud AI" if mode == "gemini" else "Knowledge Base"}</span>'
-                tags_html += f'<span class="tag-bubble">Sentiment: {sent}</span><span class="tag-bubble">Topic: {top}</span>'
-                if mode == "local" and st.session_state.get("last_api_error"):
-                    err = str(st.session_state["last_api_error"])
-                    if "403" in err:
-                        tags_html += '<span class="tag-bubble" style="color:#ef4444;border-color:#ef4444;">API Key Expired/Forbidden (403)</span>'
-                    elif "429" in err:
-                        tags_html += '<span class="tag-bubble" style="color:#f59e0b;border-color:#f59e0b;">API Quota Limit (429)</span>'
-                st.markdown(tags_html, unsafe_allow_html=True)
+                tags_html = ""
+                if sent:
+                    tags_html += f'<span class="tag-bubble">Sentiment: {sent}</span>'
+                if top:
+                    tags_html += f'<span class="tag-bubble">Topic: {top}</span>'
+                if tags_html:
+                    st.markdown(tags_html, unsafe_allow_html=True)
 
         # Store in session state
         assistant_msg = {
